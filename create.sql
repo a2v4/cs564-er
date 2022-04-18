@@ -44,7 +44,18 @@ CREATE TABLE category (category_id CHAR(256) NOT NULL UNIQUE,
 	category CHAR(256) NOT NULL,
 	PRIMARY KEY(category_id));
 
---This is the ctegory_item table which saves the all of the categories from each item. 
+--This is the bids table that saves all of the information from one bid. 
+DROP TABLE IF EXISTS bids;
+CREATE TABLE bids (bids_id CHAR(256) NOT NULL UNIQUE,
+	amount CHAR(256),
+	time CHAR(256),
+	user_id CHAR(256),
+	item_id CHAR(256),
+	PRIMARY KEY(bids_id),
+	FOREIGN KEY(user_id) REFERENCES user(user_id),
+	FOREIGN KEY(item_id) REFERENCES item(item_id));
+
+--This is the category_item table which saves the all of the categories from each item. 
 DROP TABLE IF EXISTS category_item;
 CREATE TABLE category_item (item_id CHAR(256),
 	category_id CHAR(256),
