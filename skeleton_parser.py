@@ -1,213 +1,373 @@
-
-"""
-FILE: skeleton_parser.py
-------------------
-Author: Firas Abuzaid (fabuzaid@stanford.edu)
-Author: Perth Charernwattanagul (puch@stanford.edu)
-Modified: 04/21/2014
-
-Skeleton parser for CS564 programming project 1. Has useful imports and
-functions for parsing, including:
-
-1) Directory handling -- the parser takes a list of eBay json files
-and opens each file inside of a loop. You just need to fill in the rest.
-2) Dollar value conversions -- the json files store dollar value amounts in
-a string like $3,453.23 -- we provide a function to convert it to a string
-like XXXXX.xx.
-3) Date/time conversions -- the json files store dates/ times in the form
-Mon-DD-YY HH:MM:SS -- we wrote a function (transformDttm) that converts to the
-for YYYY-MM-DD HH:MM:SS, which will sort chronologically in SQL.
-
-Your job is to implement the parseJson function, which is invoked on each file by
-the main function. We create the initial Python dictionary object of items for
-you; the rest is up to you!
-Happy parsing!
-"""
-
 import sys
 from json import loads
 from re import sub
 
-columnSeparator = "|"
-user = {}
-category = {}
-country = {}
-location = {}
-bidders = []
-bid_item = []
-itemtable = []
-item_category = []
-user_item = []
-user_bid = []
-
+COLUMN_SEPARATOR = "|"
+USER_DATA_DICT = {}
+CATEGORY_DATA_DICT = {}
+COUNTRY_DATA_DICT = {}
+LOCATION_DATA_DICT = {}
+BIDDERS_DATA_ARRAY = []
+BID_ITEM_DATA_ARRAY = []
+ITEM_TABLE_DATA_ARRAY = []
+ITEM_CATEGORY_DATA_ARRAY = []
 
 
 # Dictionary of months used for date transformation
-MONTHS = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06',\
-        'Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'}
+MONTHS = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+          'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
-"""
-Returns true if a file ends in .json
-"""
+
 def isJson(f):
+    """
+    Returns true if a file ends in .json
+    """
     return len(f) > 5 and f[-5:] == '.json'
 
-"""
-Converts month to a number, e.g. 'Dec' to '12'
-"""
+
 def transformMonth(mon):
+    """
+    Converts month to a number, e.g. 'Dec' to '12'
+    """
     if mon in MONTHS:
         return MONTHS[mon]
     else:
         return mon
 
-"""
-Transforms a timestamp from Mon-DD-YY HH:MM:SS to YYYY-MM-DD HH:MM:SS
-"""
+
 def transformDttm(dttm):
+    """
+    Transforms a timestamp from Mon-DD-YY HH:MM:SS to YYYY-MM-DD HH:MM:SS
+    """
     dttm = dttm.strip().split(' ')
     dt = dttm[0].split('-')
     date = '20' + dt[2] + '-'
     date += transformMonth(dt[0]) + '-' + dt[1]
     return date + ' ' + dttm[1]
 
-"""
-Transform a dollar value amount from a string like $3,453.23 to XXXXX.xx
-"""
 
 def transformDollar(money):
+    """
+    Transform a dollar value amount from a string like $3,453.23 to XXXXX.xx
+    """
     if money == None or len(money) == 0:
         return money
     return sub(r'[^\d.]', '', money)
 
-"""
-Parses a single json file. Currently, there's a loop that iterates over each
-item in the data set. Your job is to extend this functionality to create all
-of the necessary SQL tables for your database.
-"""
+
 def parseJson(json_file):
+    """
+    Parses a single json file. Currently, there's a loop that iterates over each
+    item in the data set. Your job is to extend this functionality to create all
+    of the necessary SQL tables for your database.
+    """
     with open(json_file, 'r') as f:
-        items = loads(f.read())['Items'] # creates a Python dictionary of Items for the supplied json file
+        # creates a Python dictionary of Items for the supplied json file
+        items = loads(f.read())['Items']
         for item in items:
             """
             TODO: traverse the items dictionary to extract information from the
             given `json_file' and generate the necessary .dat files to generate
             the SQL tables based on your relation design
             """
-            location(item)
-            users(item)
-            category(item)
-            item_table(item)
-            bids(item)
-
-def users(item):
-	if (CheckUser(item['Seller']) == False): 
-		use = item['Seller']
-		users[use['UserID']] = use['Rating'] + columnSeparator + "null"
-	else if item['Bids'] is not null:
-		for bid in item['Bids']['Bid']:
-			use = bid['Bidder']
-			users[use['UserID']] = use['Rating'] + columnSeparator + location[use['Location']][0]
-
-def CheckUser(seller):
-	if (seller['UserID'] is in user):
-		return True
-	return False
-
-def location(item):
-	if item['Location'] not in location:
-		if item['Country'] not in country:
-			country[item['Country']] = len(country) + 1
-		location[item['Location']] = (len(location) + 1, country[item['Country']])
-	else if item['Bids'] is not null:
-		for bid in item['Bids']['Bid']:
-			use = bid['Bidder']
-			CheckCountry(use)
-			CheckLocation(use)
-
-def CheckLocation(item):
-	if item['Location'] not in location:
-		location[item['Location']] = (len(location) + 1, country[item['Country']])
-
-def CheckCountry(item):
-	if item['Country'] not in country:
-		country[item['Country']] = len(country) + 1		
-
-def bids(item):
-	if item['Bids'] is null:
-		pass
-	for bid in item['Bids']['Bid']:
-		bidder = bid['Bidder']
-		bids_id = len(bidders) + 1
-		amount = bid['Amount']
-		time = transformDttm(bid['Time'])
-		user_id = bidder['UserID']
-		item_id = item['ItemID']
-		bidders.append(bids_id + columnSeparator + amount + columnSeparator + time + columnSeparator + user_id + columnSeparator + item_id)
-		bid_item.append(item_id + columnSeparator + bids_id)
-		user_bid.append(user_id + columnSeparator + bids_id)
+            # dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
+            locations_parser(item)
+            users_parser(item)
+            category_parser(item)
+            item_table_parser(item)
+            bids_parser(item)
 
 
-def category(item):
-	for cat in item['Category']:
-		if cat not in category:
-			category[cat] = len(category) + 1
+def instance_checker(data, expected_datatype) -> bool:
+    """
+    Check to make sure that the given element is the correct
+    type. If not, raise an exception to inform the user.
+    """
+    if data != None and not isinstance(data, expected_datatype):
+        raise Exception("Given data is not what was expected.")
+        return False
+    return True
 
-def item_table(item):
-	item_id = item['ItemID']
-	name = item['Name'].replace('"','""')
-	currently = transformDollar(item['Currently'])
-	first_bid = transformDollar(item['First_Bid'])
-	number_of_bids = item['Number_of_Bids']
-	started = transformDttm(item['Started'])
-	ends = transformDttm(item['ends'])
-	user_id = item['Seller']['UserID']
-	buyprice = item['Buy_Price']
-	desc = item['Description'].replace('"','""')
-	user_id = item['Seller']['UserID']
-	itemtable.append(item_id + columnSeparator + '"' +  name + '"' + columnSeparator + currently+ columnSeparator + buyprice
-		+ columnSeparator + first_bid + columnSeparator + number_of_bids + columnSeparator + started + columnSeparator + ends
-		+ columnSeparator + user_id + columnSeparator + '"' + desc + '"')
-	user_item.append(user_id + columnSeparator + item_id)
-	for cat in item['Category']:
-		item_category.append(item_id + columnSeparator + category[cat])
+
+def users_parser(item) -> None:
+    """
+    Parse users data based on data given
+
+    Parameters:
+            item (dict): dictionary to grab data from
+    Returns:
+            None
+    """
+    instance_checker(item, dict)
+
+    curr_seller = item['Seller']
+    instance_checker(curr_seller, dict)
+
+    if is_user_parsed_already(curr_seller) == False:
+        # {"UserID": "captwhiz", "Rating": "1054"}
+        '''
+        "Seller": {
+				"description": "Attributes give the seller's UserID and rating.", 
+				"type": "object",
+				"properties": {
+					"UserID": {
+						"description": "unique id for a user across all users",
+						"type": "string"
+					},
+					"Rating": {
+						"description": "Users's rating",
+						"type": "number"
+					}
+				},
+				"required": ["UserID", "Rating"]
+			},
+        '''
+        USER_DATA_DICT[curr_seller['UserID']] = curr_seller['Rating'] + \
+            COLUMN_SEPARATOR + "NULL"
+    elif item.get("Bids") != None:
+        instance_checker(item['Bids'], list)
+        for bid in item['Bids']:
+            # bid -> dict_keys(['Bid'])
+            instance_checker(bid, dict)
+
+            curr_bid = bid['Bid']
+            # curr_bid -> dict_keys(['Bidder', 'Time', 'Amount'])
+            instance_checker(curr_bid, dict)
+
+            curr_bidder = curr_bid['Bidder']
+            # curr_bidder -> dict_keys(['UserID', 'Rating', 'Location', 'Country'])
+            instance_checker(curr_bidder, dict)
+
+            # Some bidders info does not have a location/country as it is not required
+            # So this is a safe guard
+            location = curr_bidder.get('Location')
+            location_data_item = LOCATION_DATA_DICT.get(location)
+            location_entry = "NULL"
+            if location_data_item != None:
+                location_entry = location_data_item[0]
+
+            USER_DATA_DICT[curr_bidder['UserID']] = COLUMN_SEPARATOR.join(
+                [str(x) for x in [curr_bidder['Rating'], location_entry]])
+
+
+def is_user_parsed_already(seller) -> None:
+    """
+    Check whether a user has already been parsed
+
+    Parameters:
+            seller (dict): data to grab UserID from to check against
+    Returns:
+            True/False
+    """
+    instance_checker(seller, dict)
+
+    curr_seller = seller.get("UserID")
+    if curr_seller != None and curr_seller in USER_DATA_DICT:
+        return True
+    return False
+
+
+def locations_parser(item) -> None:
+    """
+    Parse location data based on data given
+
+    Parameters:
+            item (dict): dictionary to grab data from
+    Returns:
+            None
+    """
+    instance_checker(item, dict)
+
+    curr_location = item.get("Location")
+    curr_country = item.get("Country")
+    curr_bids = item.get("Bids")
+    instance_checker(curr_bids, list)
+
+    if curr_location != None and curr_country != None and curr_location not in LOCATION_DATA_DICT:
+        if curr_country not in COUNTRY_DATA_DICT:
+            COUNTRY_DATA_DICT[curr_country] = len(COUNTRY_DATA_DICT) + 1
+        LOCATION_DATA_DICT[curr_location] = (
+            len(LOCATION_DATA_DICT) + 1, COUNTRY_DATA_DICT[curr_country])
+    elif curr_bids != None:
+        for bid in curr_bids:
+            instance_checker(bid, dict)
+            # bid -> dict_keys(['Bid'])
+            curr_bid = bid['Bid']
+            # curr_bid -> dict_keys(['Bidder', 'Time', 'Amount'])
+            curr_bidder = curr_bid['Bidder']
+            instance_checker(curr_bid, dict)
+            check_country(curr_bidder)
+            check_location(curr_bidder)
+
+
+def check_location(item) -> None:
+    """
+    Parse location data based on data given
+
+    Parameters:
+            item (dict): dictionary to grab data from
+    Returns:
+            None
+    """
+    instance_checker(item, dict)
+
+    curr_location = item.get("Location")
+    curr_country = item.get("Country")
+    if curr_location != None and curr_country != None and curr_location not in LOCATION_DATA_DICT:
+        LOCATION_DATA_DICT[curr_location] = (
+            len(LOCATION_DATA_DICT) + 1, COUNTRY_DATA_DICT[curr_country])
+
+
+def check_country(item) -> None:
+    """
+    Parse country data based on data given
+
+    Parameters:
+            item (dict): dictionary to grab data from
+    Returns:
+            None
+    """
+    instance_checker(item, dict)
+
+    curr_country = item.get("Country")
+    if curr_country != None and curr_country not in COUNTRY_DATA_DICT:
+        COUNTRY_DATA_DICT[curr_country] = len(COUNTRY_DATA_DICT) + 1
+
+
+def bids_parser(item) -> None:
+    """
+    Parse bid data based on data given
+
+    Parameters:
+            item (dict): dictionary to grab data from
+    Returns:
+            None
+    """
+    instance_checker(item, dict)
+
+    bids = item.get("Bids")
+    if bids == None:
+        return
+    instance_checker(bids, list)
+
+    for bid in bids:
+        instance_checker(bid, dict)
+        # bid -> dict_keys(['Bid'])
+        curr_bid = bid['Bid']
+        # curr_bid -> dict_keys(['Bidder', 'Time', 'Amount'])
+        curr_bidder = curr_bid['Bidder']
+        instance_checker(curr_bid, dict)
+        curr_bidder = curr_bid['Bidder']
+        bids_id = len(BIDDERS_DATA_ARRAY) + 1
+        bid_amount = curr_bid['Amount']
+        bid_time = transformDttm(curr_bid['Time'])
+        bid_user_id = curr_bidder['UserID']
+        bid_item_id = item['ItemID']
+        BIDDERS_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in
+                                                         [bids_id, bid_amount, bid_time, bid_user_id, bid_item_id]]))
+        BID_ITEM_DATA_ARRAY.append(
+            COLUMN_SEPARATOR.join([str(x) for x in [bid_item_id, bids_id]]))
+
+
+def category_parser(item) -> None:
+    """
+    Parse category data based on data given
+
+    Parameters:
+            item (dict): dictionary to grab data from
+    Returns:
+            None
+    """
+    instance_checker(item, dict)
+
+    categories = item.get("Category")
+    instance_checker(categories, list)
+
+    for category in categories:
+        if category not in CATEGORY_DATA_DICT:
+            CATEGORY_DATA_DICT[category] = len(CATEGORY_DATA_DICT) + 1
+
+
+def item_table_parser(item) -> None:
+    """
+    Parse item data based on data given
+
+    Parameters:
+            item (dict): dictionary to grab data from
+    Returns:
+            None
+    """
+    instance_checker(item, dict)
+
+    item_id = item['ItemID']
+    name = item['Name'].replace('"', '""')
+    currently = transformDollar(item['Currently'])
+    first_bid = transformDollar(item['First_Bid'])
+    number_of_bids = item['Number_of_Bids']
+    started = transformDttm(item['Started'])
+    ends = transformDttm(item['Ends'])
+    user_id = item['Seller']['UserID']
+    buy_price = item.get('Buy_Price', "NULL")
+    # desc = item.get('Description', "NULL").replace('"', '""')
+    desc = item.get('Description') or "NULL"
+
+    ITEM_TABLE_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in
+                                                        [item_id, f'"{name}"', currently, buy_price, first_bid, number_of_bids, started, ends, user_id, f'"{desc}"']]))
+
+    categories = item.get("Category")
+    instance_checker(categories, list)
+
+    for category in categories:
+        ITEM_CATEGORY_DATA_ARRAY.append(
+            COLUMN_SEPARATOR.join([str(x) for x in [item_id, CATEGORY_DATA_DICT[category]]]))
 
 
 def generate_files():
-	with open('user.dat', 'w') as f:
-		f.write('\n'.join(str(user_id) + columnSeparator + rateloc for user_id, rateloc in users.iteritems()))
-	with open('location.dat', 'w') as f:
-		f.write()
-	with open('country.dat', 'w') as f:
-		f.write('\n'.join(country_id + columnSeparator + str(country_name) for country_name, countryid in country.iteritems()))
-	with open('item.dat', 'w') as f:
-		f.write('\n'.join(itemtable))
-	with open('category.dat', 'w') as f:
-		f.write('\n'.join(category_id + columnSeparator + str(category_name) for category_name, categoryid in category.iteritems()))
-	with open('category_item.dat', 'w') as f:
-		f.write('\n'.join(item_category))
-	with open('bids.dat', 'w') as f:
-		f.write('\n'.join(bidders))
-	with open('item_bids.dat', 'w') as f:
-		f.write('\n'.join(bid_item))
-	with open('user_item.dat', 'w') as f:
-		f.write('\n'.join(user_item))
-	with open('user_bid.dat', 'w') as f:
-		f.write('\n'.join(user_bid))
+    """
+    Generate and write to output files (.dat) for SQL import
 
-"""
-Loops through each json files provided on the command line and passes each file
-to the parser
-"""
+    Parameters:
+            None
+    Returns:
+            None
+    """
+    with open('user.dat', 'w') as f:
+        f.write('\n'.join(str(user_id) + COLUMN_SEPARATOR +
+                str(rateloc) for user_id, rateloc in USER_DATA_DICT.items()))
+    with open('location.dat', 'w') as f:
+        f.write('\n'.join(str(location_data[0]) + COLUMN_SEPARATOR + str(location)
+                          for location, location_data in LOCATION_DATA_DICT.items()))
+    with open('country.dat', 'w') as f:
+        f.write('\n'.join(str(country_id) + COLUMN_SEPARATOR + str(country_name)
+                for country_name, country_id in COUNTRY_DATA_DICT.items()))
+    with open('item.dat', 'w') as f:
+        f.write('\n'.join(ITEM_TABLE_DATA_ARRAY))
+    with open('category.dat', 'w') as f:
+        f.write('\n'.join(str(category_id) + COLUMN_SEPARATOR + str(category_name)
+                for category_name, category_id in CATEGORY_DATA_DICT.items()))
+    with open('category_item.dat', 'w') as f:
+        f.write('\n'.join(ITEM_CATEGORY_DATA_ARRAY))
+    with open('bids.dat', 'w') as f:
+        f.write('\n'.join(BIDDERS_DATA_ARRAY))
+    with open('item_bids.dat', 'w') as f:
+        f.write('\n'.join(BID_ITEM_DATA_ARRAY))
+
+
 def main(argv):
+    """
+    Loops through each json files provided on the command line and passes each file
+    to the parser
+    """
     if len(argv) < 2:
-        print >> sys.stderr, 'Usage: python skeleton_json_parser.py <path to json files>'
+        print('Usage: python skeleton_json_parser.py <path to json files')
         sys.exit(1)
     # loops over all .json files in the argument
     for f in argv[1:]:
         if isJson(f):
             parseJson(f)
-            print "Success parsing " + f
+            print("Success parsing " + f)
     generate_files()
+
+
 if __name__ == '__main__':
     main(sys.argv)
