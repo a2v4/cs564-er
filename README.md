@@ -15,6 +15,41 @@ CREATE TABLE user (user_id CHAR(256) NOT NULL UNIQUE,
 			FOREIGN KEY(location_id) REFERENCES location(location_id));
 ```
 
+# User_Item
+
+This is a user table where it includes all sellers that sells.
+
+| **USER_ITEM** |         |           |
+| ------------- | ------- | --------- |
+| **PK,**FK     | user_id | CHAR(256) |
+| **PK,**FK     | item_id | CHAR(256) |
+
+```sql
+CREATE TABLE user_item (user_id CHAR(256) NOT NULL,
+			item_id CHAR(256) NOT NULL,
+			PRIMARY KEY(user_id, item_id),
+			FOREIGN KEY(user_id) REFERENCES user(user_id),
+			FOREIGN KEY(item_id) REFERENCES item(item_id));
+```
+
+# User_Bid
+
+This is a user table where it includes all sellers that bids.
+
+| **USER_BID** |         |           |
+| ------------ | ------- | --------- |
+| **PK,**FK    | user_id | CHAR(256) |
+| **PK,**FK    | bids_id | CHAR(256) |
+
+```sql
+CREATE TABLE user_bid (user_id CHAR(256) NOT NULL,
+			bids_id CHAR(256) NOT NULL,
+			PRIMARY KEY(user_id, bids_id),
+			FOREIGN KEY(user_id) REFERENCES user(user_id),
+			FOREIGN KEY(bids_id) REFERENCES item(bids_id));
+```
+  
+
 # Location
 This is a location table where it saves information on location and the country id.
 
