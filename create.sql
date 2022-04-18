@@ -27,8 +27,8 @@ DROP TABLE IF EXISTS item;
 CREATE TABLE item (item_id CHAR(256) NOT NULL UNIQUE,
 	name CHAR(256),
 	currently CHAR(256),
-	buy_price CHAR(256),
-	first_bid CHAR(256),
+	buy_price DOUBLE,
+	first_bid DOUBLE,
 	number_of_bids INT,
 	started CHAR(256),
 	ends CHAR(256),
@@ -53,10 +53,26 @@ CREATE TABLE category_item (item_id CHAR(256),
 --This is the bids table that saves all of the information from one bid. 
 DROP TABLE IF EXISTS item_bids;
 CREATE TABLE bids (item_id CHAR(256) NOT NULL,
-	bids_id CHAR(256),
+	bids_id CHAR(256) NOT NULL,
 	PRIMARY KEY(item_id, bids_id),
 	FOREIGN KEY(bids_id) REFERENCES bids(bids_id),
 	FOREIGN KEY(item_id) REFERENCES item(item_id));
+
+--This is a user_item table where it includes all users that sells. 
+DROP TABLE IF EXISTS user_item;
+CREATE TABLE user_item (user_id CHAR(256) NOT NULL,
+	item_id CHAR(256) NOT NULL,
+	PRIMARY KEY(user_id, item_id),
+	FOREIGN KEY(user_id) REFERENCES user(user_id),
+	FOREIGN KEY(item_id) REFERENCES item(item_id));
+
+--This is a user_bid table where it includes all user that bids. 
+DROP TABLE IF EXISTS user_bid;
+CREATE TABLE user_bid (user_id CHAR(256) NOT NULL,
+	bids_id CHAR(256) NOT NULL,
+	PRIMARY KEY(user_id, bids_id),
+	FOREIGN KEY(user_id) REFERENCES user(user_id),
+	FOREIGN KEY(bids_id) REFERENCES item(bids_id));
 
 
 
