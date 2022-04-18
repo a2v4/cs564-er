@@ -1,0 +1,10 @@
+.separator |
+
+.import user.dat user
+.import location.dat location
+.import country.dat country
+.import items.dat items
+.import category.dat category
+.import category_item.dat category_item
+.import bids.dat bids
+.import item_bids.dat item_bids
