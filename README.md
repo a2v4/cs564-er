@@ -1,3 +1,20 @@
+## How to run
+
+1. Clone the repository
+
+
+```bash
+git clone git@github.com:a2v4/cs564-er.git
+```
+
+2. Run the following command
+
+```bash
+python3 ./skeleton_parser.py ./ebay_data/items-all.json
+```
+
+***
+
 ![](https://github.com/a2v4/cs564-er/raw/main/Database_Diagram.png)
 
 # User
