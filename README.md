@@ -95,7 +95,7 @@ CREATE TABLE category (category_id CHAR(256) NOT NULL UNIQUE,
 ```
 
 # Category_Item
-This is the ctegory_item table which saves all of the categories from each item.
+This is the category_item table which saves all of the categories from each item.
 
 || **CATEGORY_ITEM**||
 | ----------------- | ----------- | --------- |
