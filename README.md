@@ -1,3 +1,5 @@
+![](https://github.com/a2v4/cs564-er/raw/main/Database_Diagram.png)
+
 # User
 This is a user table where it includes all sellers and all bidders. It saves the information of the users such as rating and location id.
 
