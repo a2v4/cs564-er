@@ -11,6 +11,8 @@ BIDDERS_DATA_ARRAY = []
 BID_ITEM_DATA_ARRAY = []
 ITEM_TABLE_DATA_ARRAY = []
 ITEM_CATEGORY_DATA_ARRAY = []
+USER_ITEM_DATA_ARRAY = []
+USER_BID_DATA_ARRAY = []
 
 
 # Dictionary of months used for date transformation
@@ -267,6 +269,7 @@ def bids_parser(item) -> None:
                                                          [bids_id, bid_amount, bid_time, bid_user_id, bid_item_id]]))
         BID_ITEM_DATA_ARRAY.append(
             COLUMN_SEPARATOR.join([str(x) for x in [bid_item_id, bids_id]]))
+        USER_BID_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in [bid_user_id, bids_id]]))
 
 
 def category_parser(item) -> None:
@@ -313,6 +316,7 @@ def item_table_parser(item) -> None:
 
     ITEM_TABLE_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in
                                                         [item_id, f'"{name}"', currently, buy_price, first_bid, number_of_bids, started, ends, user_id, f'"{desc}"']]))
+    USER_ITEM_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in [user_id, item_id]]))
 
     categories = item.get("Category")
     instance_checker(categories, list)
@@ -351,6 +355,10 @@ def generate_files():
         f.write('\n'.join(BIDDERS_DATA_ARRAY))
     with open('item_bids.dat', 'w') as f:
         f.write('\n'.join(BID_ITEM_DATA_ARRAY))
+    with open('user_item.dat', 'w') as f:
+    	f.write('\n'.join(USER_ITEM_DATA_ARRAY))
+    with open('user_bid.dat', 'w') as f:
+    	f.write('\n'.join(USER_BID_DATA_ARRAY))
 
 
 def main(argv):

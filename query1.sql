@@ -1,3 +1,3 @@
 #Find the number of users in the database
-SELECT COUNT(*) FROM users;
+SELECT COUNT(*) FROM user;
 
