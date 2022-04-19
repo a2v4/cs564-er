@@ -72,7 +72,7 @@ def parseJson(json_file):
             given `json_file' and generate the necessary .dat files to generate
             the SQL tables based on your relation design
             """
-            # dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
+            # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
             locations_parser(item)
             users_parser(item)
             category_parser(item)
@@ -101,6 +101,7 @@ def users_parser(item) -> None:
             None
     """
     instance_checker(item, dict)
+    # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
     curr_seller = item['Seller']
     instance_checker(curr_seller, dict)
@@ -109,24 +110,24 @@ def users_parser(item) -> None:
         # {"UserID": "captwhiz", "Rating": "1054"}
         '''
         "Seller": {
-				"description": "Attributes give the seller's UserID and rating.", 
-				"type": "object",
-				"properties": {
-					"UserID": {
-						"description": "unique id for a user across all users",
-						"type": "string"
-					},
-					"Rating": {
-						"description": "Users's rating",
-						"type": "number"
-					}
-				},
-				"required": ["UserID", "Rating"]
-			},
+                                "description": "Attributes give the seller's UserID and rating.", 
+                                "type": "object",
+                                "properties": {
+                                        "UserID": {
+                                                "description": "unique id for a user across all users",
+                                                "type": "string"
+                                        },
+                                        "Rating": {
+                                                "description": "Users's rating",
+                                                "type": "number"
+                                        }
+                                },
+                                "required": ["UserID", "Rating"]
+                        },
         '''
         USER_DATA_DICT[curr_seller['UserID']] = curr_seller['Rating'] + \
             COLUMN_SEPARATOR + "NULL"
-    elif item.get("Bids") != None:
+    if item.get("Bids") != None:
         instance_checker(item['Bids'], list)
         for bid in item['Bids']:
             # bid -> dict_keys(['Bid'])
@@ -162,6 +163,7 @@ def is_user_parsed_already(seller) -> None:
             True/False
     """
     instance_checker(seller, dict)
+    # seller.keys() -> dict_keys(['UserID', 'Rating'])
 
     curr_seller = seller.get("UserID")
     if curr_seller != None and curr_seller in USER_DATA_DICT:
@@ -179,6 +181,7 @@ def locations_parser(item) -> None:
             None
     """
     instance_checker(item, dict)
+    # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
     curr_location = item.get("Location")
     curr_country = item.get("Country")
@@ -190,7 +193,7 @@ def locations_parser(item) -> None:
             COUNTRY_DATA_DICT[curr_country] = len(COUNTRY_DATA_DICT) + 1
         LOCATION_DATA_DICT[curr_location] = (
             len(LOCATION_DATA_DICT) + 1, COUNTRY_DATA_DICT[curr_country])
-    elif curr_bids != None:
+    if curr_bids != None:
         for bid in curr_bids:
             instance_checker(bid, dict)
             # bid -> dict_keys(['Bid'])
@@ -212,6 +215,7 @@ def check_location(item) -> None:
             None
     """
     instance_checker(item, dict)
+    # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
     curr_location = item.get("Location")
     curr_country = item.get("Country")
@@ -230,6 +234,7 @@ def check_country(item) -> None:
             None
     """
     instance_checker(item, dict)
+    # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
     curr_country = item.get("Country")
     if curr_country != None and curr_country not in COUNTRY_DATA_DICT:
@@ -246,6 +251,7 @@ def bids_parser(item) -> None:
             None
     """
     instance_checker(item, dict)
+    # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
     bids = item.get("Bids")
     if bids == None:
@@ -258,8 +264,8 @@ def bids_parser(item) -> None:
         curr_bid = bid['Bid']
         # curr_bid -> dict_keys(['Bidder', 'Time', 'Amount'])
         curr_bidder = curr_bid['Bidder']
+        # curr_bidder -> dict_keys(['UserID', 'Rating', 'Location', 'Country'])
         instance_checker(curr_bid, dict)
-        curr_bidder = curr_bid['Bidder']
         bids_id = len(BIDDERS_DATA_ARRAY) + 1
         bid_amount = curr_bid['Amount']
         bid_time = transformDttm(curr_bid['Time'])
@@ -269,7 +275,8 @@ def bids_parser(item) -> None:
                                                          [bids_id, bid_amount, bid_time, bid_user_id, bid_item_id]]))
         BID_ITEM_DATA_ARRAY.append(
             COLUMN_SEPARATOR.join([str(x) for x in [bid_item_id, bids_id]]))
-        USER_BID_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in [bid_user_id, bids_id]]))
+        USER_BID_DATA_ARRAY.append(COLUMN_SEPARATOR.join(
+            [str(x) for x in [bid_user_id, bids_id]]))
 
 
 def category_parser(item) -> None:
@@ -282,6 +289,7 @@ def category_parser(item) -> None:
             None
     """
     instance_checker(item, dict)
+    # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
     categories = item.get("Category")
     instance_checker(categories, list)
@@ -301,22 +309,25 @@ def item_table_parser(item) -> None:
             None
     """
     instance_checker(item, dict)
+    # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
-    item_id = item['ItemID']
-    name = item['Name'].replace('"', '""')
-    currently = transformDollar(item['Currently'])
-    first_bid = transformDollar(item['First_Bid'])
-    number_of_bids = item['Number_of_Bids']
-    started = transformDttm(item['Started'])
-    ends = transformDttm(item['Ends'])
-    user_id = item['Seller']['UserID']
+    item_id = item.get('ItemID', 'NULL')
+    name = sub(r'"+', '""', item.get('Name', 'NULL'))
+    currently = transformDollar(item.get('Currently', 'NULL'))
+    first_bid = transformDollar(item.get('First_Bid', 'NULL'))
+    number_of_bids = item.get('Number_of_Bids', 'NULL')
+    started = transformDttm(item.get('Started', 'NULL'))
+    ends = transformDttm(item.get('Ends', 'NULL'))
+    user_id = item.get('Seller', {}).get('UserID', 'NULL')
     buy_price = item.get('Buy_Price', "NULL")
-    # desc = item.get('Description', "NULL").replace('"', '""')
-    desc = item.get('Description') or "NULL"
+    # some descriptions are None, so the 'or' will replace it with a 'NULL'
+    item_desc = item.get('Description', 'NULL') or 'NULL'
+    desc = sub(r'"+', '""', item_desc)
 
     ITEM_TABLE_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in
                                                         [item_id, f'"{name}"', currently, buy_price, first_bid, number_of_bids, started, ends, user_id, f'"{desc}"']]))
-    USER_ITEM_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in [user_id, item_id]]))
+    USER_ITEM_DATA_ARRAY.append(COLUMN_SEPARATOR.join(
+        [str(x) for x in [user_id, item_id]]))
 
     categories = item.get("Category")
     instance_checker(categories, list)
@@ -356,9 +367,9 @@ def generate_files():
     with open('item_bids.dat', 'w') as f:
         f.write('\n'.join(BID_ITEM_DATA_ARRAY))
     with open('user_item.dat', 'w') as f:
-    	f.write('\n'.join(USER_ITEM_DATA_ARRAY))
+        f.write('\n'.join(USER_ITEM_DATA_ARRAY))
     with open('user_bid.dat', 'w') as f:
-    	f.write('\n'.join(USER_BID_DATA_ARRAY))
+        f.write('\n'.join(USER_BID_DATA_ARRAY))
 
 
 def main(argv):
