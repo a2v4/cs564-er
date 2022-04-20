@@ -3,15 +3,15 @@
 .import user.dat user
 
 .import location.dat location
-update items set location = null where location  = 'NULL';
+update location set location = null where location  = 'NULL';
 
 .import country.dat country
-update items set country = null where country  = 'NULL';
+update country set country = null where country  = 'NULL';
 
-.import item.dat items
+.import item.dat item
 update item set buy_price = null where buy_price = 'NULL';
-update items set first_bid = null where first_bid  = 'NULL';
-update items set description = null where description  = 'NULL';
+update item set first_bid = null where first_bid  = 'NULL';
+update item set description = null where description  = 'NULL';
 
 .import category.dat category
 

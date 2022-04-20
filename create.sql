@@ -59,11 +59,13 @@ CREATE TABLE bids (bids_id CHAR(256) NOT NULL UNIQUE,
 DROP TABLE IF EXISTS category_item;
 CREATE TABLE category_item (item_id CHAR(256),
 	category_id CHAR(256),
-	PRIMARY KEY(item_id, category_id));
+	PRIMARY KEY(item_id, category_id),
+	FOREIGN KEY(item_id) REFERENCES item(item_id),
+	FOREIGN KEY(category_id) REFERENCES category(category_id));
 
 --This is the bids table that saves all of the information from one bid. 
 DROP TABLE IF EXISTS item_bids;
-CREATE TABLE bids (item_id CHAR(256) NOT NULL,
+CREATE TABLE item_bids (item_id CHAR(256) NOT NULL,
 	bids_id CHAR(256) NOT NULL,
 	PRIMARY KEY(item_id, bids_id),
 	FOREIGN KEY(bids_id) REFERENCES bids(bids_id),
