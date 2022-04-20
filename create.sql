@@ -63,7 +63,7 @@ CREATE TABLE category_item (item_id CHAR(256),
 
 --This is the bids table that saves all of the information from one bid. 
 DROP TABLE IF EXISTS item_bids;
-CREATE TABLE bids (item_id CHAR(256) NOT NULL,
+CREATE TABLE item_bids (item_id CHAR(256) NOT NULL,
 	bids_id CHAR(256) NOT NULL,
 	PRIMARY KEY(item_id, bids_id),
 	FOREIGN KEY(bids_id) REFERENCES bids(bids_id),
