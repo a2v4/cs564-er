@@ -23,4 +23,4 @@ update item set description = null where description  = 'NULL';
 
 .import user_item.dat user_item
 
-.import user_bid.dat user_bids
+.import user_bid.dat user_bid

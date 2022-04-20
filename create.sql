@@ -26,7 +26,7 @@ CREATE TABLE country (country_id CHAR(256) NOT NULL UNIQUE,
 DROP TABLE IF EXISTS item;
 CREATE TABLE item (item_id CHAR(256) NOT NULL UNIQUE,
 	name CHAR(256),
-	currently CHAR(256),
+	currently INT,
 	buy_price DOUBLE,
 	first_bid DOUBLE,
 	number_of_bids INT,

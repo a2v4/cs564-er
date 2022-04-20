@@ -1,2 +1,2 @@
 #Find the number of users from New York
-SELECT COUNT(*) FROM user, location WHERE location.location = "New York" and user.location_id = location.location_id;
+SELECT COUNT(*) FROM user u, location l WHERE l.location = "New York" AND u.location_id = l.location_id;
