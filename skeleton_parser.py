@@ -141,8 +141,10 @@ def users_parser(item) -> None:
                                 "required": ["UserID", "Rating"]
                         },
         '''
-        USER_DATA_DICT[curr_seller['UserID']] = curr_seller['Rating'] + \
-            COLUMN_SEPARATOR + "NULL"
+
+        USER_DATA_DICT[curr_seller.get('UserID')] = COLUMN_SEPARATOR.join(
+            [escape_quotes(str(x)) for x in [curr_seller.get('Rating'), LOCATION_DATA_DICT.get(item.get("Location"), ["NULL"])[0]]])
+
     if item.get("Bids") != None:
         instance_checker(item['Bids'], list)
         for bid in item['Bids']:
