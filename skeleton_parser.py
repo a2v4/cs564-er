@@ -347,7 +347,8 @@ def item_table_parser(item) -> None:
     categories = item.get("Category")
     instance_checker(categories, list)
 
-    for category in categories:
+    # list(set()) -> used to remove duplicate categories
+    for category in list(set(categories)):
         ITEM_CATEGORY_DATA_ARRAY.append(
             COLUMN_SEPARATOR.join([escape_quotes(str(x)) for x in [item_id, CATEGORY_DATA_DICT[category]]]))
 
