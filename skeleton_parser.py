@@ -365,7 +365,7 @@ def generate_files():
         f.write('\n'.join(str(user_id) + COLUMN_SEPARATOR +
                 str(rateloc) for user_id, rateloc in USER_DATA_DICT.items()))
     with open('location.dat', 'w') as f:
-        f.write('\n'.join(str(location_data[0]) + COLUMN_SEPARATOR + str(location)
+        f.write('\n'.join(str(location_data[0]) + COLUMN_SEPARATOR + str(location) + COLUMN_SEPARATOR + str(location_data[1])
                           for location, location_data in LOCATION_DATA_DICT.items()))
     with open('country.dat', 'w') as f:
         f.write('\n'.join(str(country_id) + COLUMN_SEPARATOR + str(country_name)
