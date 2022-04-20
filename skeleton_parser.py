@@ -91,6 +91,18 @@ def instance_checker(data, expected_datatype) -> bool:
     return True
 
 
+def escape_quotes(string) -> str:
+    """
+    Escape quotes within given string to allow SQL to parse correctly
+
+    Parameters:
+            string (str): the string to manipulate
+    Returns:
+            str: parsed string with escape quotes if found
+    """
+    return sub(r'"+', '""', string)
+
+
 def users_parser(item) -> None:
     """
     Parse users data based on data given
@@ -150,7 +162,7 @@ def users_parser(item) -> None:
                 location_entry = location_data_item[0]
 
             USER_DATA_DICT[curr_bidder['UserID']] = COLUMN_SEPARATOR.join(
-                [str(x) for x in [curr_bidder['Rating'], location_entry]])
+                [escape_quotes(str(x)) for x in [curr_bidder['Rating'], location_entry]])
 
 
 def is_user_parsed_already(seller) -> None:
@@ -166,7 +178,7 @@ def is_user_parsed_already(seller) -> None:
     # seller.keys() -> dict_keys(['UserID', 'Rating'])
 
     curr_seller = seller.get("UserID")
-    if curr_seller != None and curr_seller in USER_DATA_DICT:
+    if curr_seller not in (None, "NULL") and curr_seller in USER_DATA_DICT:
         return True
     return False
 
@@ -183,12 +195,12 @@ def locations_parser(item) -> None:
     instance_checker(item, dict)
     # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
-    curr_location = item.get("Location")
-    curr_country = item.get("Country")
+    curr_location = escape_quotes(item.get("Location", "NULL"))
+    curr_country = escape_quotes(item.get("Country", "NULL"))
     curr_bids = item.get("Bids")
     instance_checker(curr_bids, list)
 
-    if curr_location != None and curr_country != None and curr_location not in LOCATION_DATA_DICT:
+    if curr_location not in (None, "NULL") and curr_country not in (None, "NULL") and curr_location not in LOCATION_DATA_DICT:
         if curr_country not in COUNTRY_DATA_DICT:
             COUNTRY_DATA_DICT[curr_country] = len(COUNTRY_DATA_DICT) + 1
         LOCATION_DATA_DICT[curr_location] = (
@@ -217,9 +229,9 @@ def check_location(item) -> None:
     instance_checker(item, dict)
     # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
-    curr_location = item.get("Location")
-    curr_country = item.get("Country")
-    if curr_location != None and curr_country != None and curr_location not in LOCATION_DATA_DICT:
+    curr_location = escape_quotes(item.get("Location", "NULL"))
+    curr_country = escape_quotes(item.get("Country", "NULL"))
+    if curr_location not in (None, "NULL") and curr_country not in (None, "NULL") and curr_location not in LOCATION_DATA_DICT:
         LOCATION_DATA_DICT[curr_location] = (
             len(LOCATION_DATA_DICT) + 1, COUNTRY_DATA_DICT[curr_country])
 
@@ -236,8 +248,8 @@ def check_country(item) -> None:
     instance_checker(item, dict)
     # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
-    curr_country = item.get("Country")
-    if curr_country != None and curr_country not in COUNTRY_DATA_DICT:
+    curr_country = escape_quotes(item.get("Country", "NULL"))
+    if curr_country not in (None, "NULL") and curr_country not in COUNTRY_DATA_DICT:
         COUNTRY_DATA_DICT[curr_country] = len(COUNTRY_DATA_DICT) + 1
 
 
@@ -271,12 +283,12 @@ def bids_parser(item) -> None:
         bid_time = transformDttm(curr_bid['Time'])
         bid_user_id = curr_bidder['UserID']
         bid_item_id = item['ItemID']
-        BIDDERS_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in
+        BIDDERS_DATA_ARRAY.append(COLUMN_SEPARATOR.join([escape_quotes(str(x)) for x in
                                                          [bids_id, bid_amount, bid_time, bid_user_id, bid_item_id]]))
         BID_ITEM_DATA_ARRAY.append(
-            COLUMN_SEPARATOR.join([str(x) for x in [bid_item_id, bids_id]]))
+            COLUMN_SEPARATOR.join([escape_quotes(str(x)) for x in [bid_item_id, bids_id]]))
         USER_BID_DATA_ARRAY.append(COLUMN_SEPARATOR.join(
-            [str(x) for x in [bid_user_id, bids_id]]))
+            [escape_quotes(str(x)) for x in [bid_user_id, bids_id]]))
 
 
 def category_parser(item) -> None:
@@ -312,7 +324,7 @@ def item_table_parser(item) -> None:
     # item.keys() -> dict_keys(['ItemID', 'Name', 'Category', 'Currently', 'First_Bid', 'Number_of_Bids', 'Bids', 'Location', 'Country', 'Started', 'Ends', 'Seller', 'Description'])
 
     item_id = item.get('ItemID', 'NULL')
-    name = sub(r'"+', '""', item.get('Name', 'NULL'))
+    name = item.get('Name', 'NULL')
     currently = transformDollar(item.get('Currently', 'NULL'))
     first_bid = transformDollar(item.get('First_Bid', 'NULL'))
     number_of_bids = item.get('Number_of_Bids', 'NULL')
@@ -321,20 +333,19 @@ def item_table_parser(item) -> None:
     user_id = item.get('Seller', {}).get('UserID', 'NULL')
     buy_price = item.get('Buy_Price', "NULL")
     # some descriptions are None, so the 'or' will replace it with a 'NULL'
-    item_desc = item.get('Description', 'NULL') or 'NULL'
-    desc = sub(r'"+', '""', item_desc)
+    desc = item.get('Description', 'NULL') or 'NULL'
 
-    ITEM_TABLE_DATA_ARRAY.append(COLUMN_SEPARATOR.join([str(x) for x in
+    ITEM_TABLE_DATA_ARRAY.append(COLUMN_SEPARATOR.join([escape_quotes(str(x)) for x in
                                                         [item_id, f'"{name}"', currently, buy_price, first_bid, number_of_bids, started, ends, user_id, f'"{desc}"']]))
     USER_ITEM_DATA_ARRAY.append(COLUMN_SEPARATOR.join(
-        [str(x) for x in [user_id, item_id]]))
+        [escape_quotes(str(x)) for x in [user_id, item_id]]))
 
     categories = item.get("Category")
     instance_checker(categories, list)
 
     for category in categories:
         ITEM_CATEGORY_DATA_ARRAY.append(
-            COLUMN_SEPARATOR.join([str(x) for x in [item_id, CATEGORY_DATA_DICT[category]]]))
+            COLUMN_SEPARATOR.join([escape_quotes(str(x)) for x in [item_id, CATEGORY_DATA_DICT[category]]]))
 
 
 def generate_files():
