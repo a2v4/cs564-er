@@ -93,14 +93,18 @@ def instance_checker(data, expected_datatype) -> bool:
 
 def escape_quotes(string) -> str:
     """
-    Escape quotes within given string to allow SQL to parse correctly
+    Escape quotes within given string to allow SQL to parse correctly.
+    If the string was modified, wrap it with quotes.
 
     Parameters:
             string (str): the string to manipulate
     Returns:
             str: parsed string with escape quotes if found
     """
-    return sub(r'"+', '""', string)
+    new_string = sub(r'"', '""', string)
+    if new_string != string:
+        return f'"{new_string}"'
+    return string
 
 
 def users_parser(item) -> None:
