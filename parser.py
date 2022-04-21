@@ -364,29 +364,29 @@ def generate_files():
     Returns:
             None
     """
-    with open('user.dat', 'w') as f:
+    with open('user.dat', 'a') as f:
         f.write('\n'.join(str(user_id) + COLUMN_SEPARATOR +
                 str(rateloc) for user_id, rateloc in USER_DATA_DICT.items()))
-    with open('location.dat', 'w') as f:
+    with open('location.dat', 'a') as f:
         f.write('\n'.join(str(location_data[0]) + COLUMN_SEPARATOR + str(location) + COLUMN_SEPARATOR + str(location_data[1])
                           for location, location_data in LOCATION_DATA_DICT.items()))
-    with open('country.dat', 'w') as f:
+    with open('country.dat', 'a') as f:
         f.write('\n'.join(str(country_id) + COLUMN_SEPARATOR + str(country_name)
                 for country_name, country_id in COUNTRY_DATA_DICT.items()))
-    with open('item.dat', 'w') as f:
+    with open('item.dat', 'a') as f:
         f.write('\n'.join(ITEM_TABLE_DATA_ARRAY))
-    with open('category.dat', 'w') as f:
+    with open('category.dat', 'a') as f:
         f.write('\n'.join(str(category_id) + COLUMN_SEPARATOR + str(category_name)
                 for category_name, category_id in CATEGORY_DATA_DICT.items()))
-    with open('category_item.dat', 'w') as f:
+    with open('category_item.dat', 'a') as f:
         f.write('\n'.join(ITEM_CATEGORY_DATA_ARRAY))
-    with open('bids.dat', 'w') as f:
+    with open('bids.dat', 'a') as f:
         f.write('\n'.join(BIDDERS_DATA_ARRAY))
-    with open('item_bids.dat', 'w') as f:
+    with open('item_bids.dat', 'a') as f:
         f.write('\n'.join(BID_ITEM_DATA_ARRAY))
-    with open('user_item.dat', 'w') as f:
+    with open('user_item.dat', 'a') as f:
         f.write('\n'.join(USER_ITEM_DATA_ARRAY))
-    with open('user_bid.dat', 'w') as f:
+    with open('user_bid.dat', 'a') as f:
         f.write('\n'.join(USER_BID_DATA_ARRAY))
 
 
